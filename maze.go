@@ -1,42 +1,54 @@
 package maze
 
-/*
-	# # # # # # # # # # # # # # # # # # # # #
-	                #       #               #
-	# # # # #   # # # # #   #   # # # # #   #
-	#       #   #       #   #   #       #   #
-	#   # # #   #   # # #   # # #   #   #   #
-	#   #       #   #               #   #   #
-	#   # # #   #   #   # # #   # # # # #   #
-	#               #       #       #       #
- 	# # #   # # # # # # #   #   # # # # #   #
-	#       #               #               #
-	# # #   # # #   # # #   # # # # # # #   #
-	#                   #   #       #       #
-	#   # # #   # # #   # # #   # # #   # # #
-	#   #   #       #               #   #   #
-	#   #   #   # # #   # # # # #   # # #   #
-	#       #       #   #       #   #       #
-	#   # # #   # # #   #   # # # # # # #   #
-	#   #   #       #   #   #   #       #   #
-	#   #   # # #   # # #   #   #   #   #   #
-	#       #                       #
-	# # # # # # # # # # # # # # # # # # # # #
-*/
-/*
-	wallChar := []byte("#")[0]
-	maze := []byte("#####################        #   #       ###### ##### # ##### ##   # #   # # #   # ## ### # ### ### # # ## #   # #       # # ## ### # # ### ##### ##       #   #   #   #### ####### # ##### ##   #       #       #### ### ### ####### ##         # #   #   ## ### ### ### ### #### # #   #       # # ## # # ### ##### ### ##   #   # #   # #   ## ### ### # ####### ## # #   # # # #   # ## # ### ### # # # # ##   #           #    #####################")
-	walls := []int{}
-	for index, char := range maze {
-		if char == wallChar {
-			walls = append(walls, (index + 1))
+import "fmt"
+
+func ShortestRoutes(size int, walls []int, start, target int) [][]int {
+	possibleRoutes := make([][]int, 0, 100)
+	possibleRoutes = append(possibleRoutes, []int{start})
+	shortestRoutes := [][]int{}
+	found := false
+	i := 0
+	for !found {
+		i++
+		toBeRemovedIndex := []int{}
+		newPossibleRoute := make([][]int, 0)
+		for possibleRouteIndex, possibleRoute := range possibleRoutes {
+			position := possibleRoute[(len(possibleRoute) - 1)]
+			availablePaths := availablePaths(size, walls, position)
+			if len(availablePaths) == 1 && len(possibleRoute) > 1 {
+				toBeRemovedIndex = append(toBeRemovedIndex, possibleRouteIndex)
+			}
+			validPathTaken := 0
+			for _, availablePath := range availablePaths {
+				if len(possibleRoute) > 1 && availablePath == possibleRoute[(len(possibleRoute)-2)] {
+					continue
+				}
+				newRoute := append([]int{}, possibleRoute...)
+				newRoute = append(newRoute, availablePath)
+				if availablePath == target {
+					found = true
+					shortestRoutes = append(shortestRoutes, newRoute)
+					break
+				}
+				if validPathTaken == 0 {
+					toBeRemovedIndex = append(toBeRemovedIndex, possibleRouteIndex)
+					newPossibleRoute = append(newPossibleRoute, newRoute)
+					validPathTaken++
+				} else {
+					newPossibleRoute = append(newPossibleRoute, newRoute)
+				}
+			}
+			fmt.Printf("possible route %v:\n", possibleRouteIndex)
+			fmt.Println(possibleRoute)
 		}
+		for timesRemoved, index := range toBeRemovedIndex {
+			possibleRoutes = remove(possibleRoutes, index-timesRemoved)
+		}
+		possibleRoutes = append(possibleRoutes, newPossibleRoute...)
+		fmt.Println("level:")
+		fmt.Println(i)
 	}
-*/
-
-func ShortestRoutes(size int, wall []int, start, target int) [][]int {
-
-	return nil
+	return shortestRoutes
 }
 
 func availablePaths(size int, walls []int, position int) []int {
@@ -69,4 +81,8 @@ func availablePaths(size int, walls []int, position int) []int {
 		}
 	}
 	return availablePaths
+}
+
+func remove(slice [][]int, s int) [][]int {
+	return append(slice[:s], slice[s+1:]...)
 }
