@@ -1,59 +1,83 @@
 package maze
 
-import "fmt"
+import "sort"
 
+//ShortestRoutes search the most optimal route to reach the target on a given params
+//size := the size of the grid (ex. 5)
+//walls := grid numbers that cannot counts as an obstacle (ex. [6,7,8,10])
+//start := the starting position (ex. 1)
+//target := ex. 11
+// 1  2  3  4  5
+//######### 9 ###
+//11 12 13 14 15
+//16 17 18 19 20
+//21 22 23 24 25
+//return : [1,2,3,4,9,14,13,12,11]
 func ShortestRoutes(size int, walls []int, start, target int) [][]int {
+	//variable declarations
 	possibleRoutes := make([][]int, 0, 100)
 	possibleRoutes = append(possibleRoutes, []int{start})
 	shortestRoutes := [][]int{}
 	found := false
-	i := 0
+
+	//loop until reached the target
 	for !found {
-		i++
+		//need to remove deadend route after the loop to prevent indexOutOfBound error
 		toBeRemovedIndex := []int{}
+		//to store newfound route at crossroads or T junctions
 		newPossibleRoute := make([][]int, 0)
+		//loop through all possible route and find their next available path,
+		//if found crossroads or T junctions, then create new slices to store those new routes
 		for possibleRouteIndex, possibleRoute := range possibleRoutes {
 			position := possibleRoute[(len(possibleRoute) - 1)]
 			availablePaths := availablePaths(size, walls, position)
+			//if a route doesn't have available path anymore other than the previous position
+			//then remove it
 			if len(availablePaths) == 1 && len(possibleRoute) > 1 {
 				toBeRemovedIndex = append(toBeRemovedIndex, possibleRouteIndex)
 			}
-			validPathTaken := 0
+
+			//loop through all possible path and replace current loop with the updated loop
+			//and add new route (if any)
+			firstAvailablePath := true
 			for _, availablePath := range availablePaths {
 				if len(possibleRoute) > 1 && availablePath == possibleRoute[(len(possibleRoute)-2)] {
 					continue
 				}
 				newRoute := append([]int{}, possibleRoute...)
 				newRoute = append(newRoute, availablePath)
+				//if one of the available path is the target then we found the shortest route
+				//continue to find another route to check if any other route can reach the target
+				//with the same number of step
 				if availablePath == target {
 					found = true
 					shortestRoutes = append(shortestRoutes, newRoute)
 					break
 				}
-				if validPathTaken == 0 {
+				//only need to be called once to remove current route
+				if firstAvailablePath {
 					toBeRemovedIndex = append(toBeRemovedIndex, possibleRouteIndex)
-					newPossibleRoute = append(newPossibleRoute, newRoute)
-					validPathTaken++
-				} else {
-					newPossibleRoute = append(newPossibleRoute, newRoute)
+					firstAvailablePath = false
 				}
+				newPossibleRoute = append(newPossibleRoute, newRoute)
 			}
-			fmt.Printf("possible route %v:\n", possibleRouteIndex)
-			fmt.Println(possibleRoute)
 		}
+		//safely remove routes that need to be removed
+		sort.Ints(toBeRemovedIndex)
 		for timesRemoved, index := range toBeRemovedIndex {
 			possibleRoutes = remove(possibleRoutes, index-timesRemoved)
 		}
+		//add new possible routes if any
 		possibleRoutes = append(possibleRoutes, newPossibleRoute...)
-		fmt.Println("level:")
-		fmt.Println(i)
 	}
 	return shortestRoutes
 }
 
+//helper function to see get the available path on a maze based on the position
 func availablePaths(size int, walls []int, position int) []int {
 	paths := make(map[string]int)
 
+	//get all possible move then map it
 	availablePaths := []int{}
 	paths["up"] = position - size
 	paths["right"] = position + 1
@@ -61,6 +85,7 @@ func availablePaths(size int, walls []int, position int) []int {
 	paths["left"] = position - 1
 
 	maxBlock := size * size
+	//for all the allowed paths, if it out of bounds or a wall then it's not a valid path
 	for key, path := range paths {
 		valid := true
 		if (path < 0) || //Over the top maze boundary
@@ -83,6 +108,7 @@ func availablePaths(size int, walls []int, position int) []int {
 	return availablePaths
 }
 
+//helper function to remove slice of slices element
 func remove(slice [][]int, s int) [][]int {
 	return append(slice[:s], slice[s+1:]...)
 }
