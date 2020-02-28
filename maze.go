@@ -118,29 +118,22 @@ func remove(slice [][]int, s int) [][]int {
 
 func DisplayMaze(size int, walls, path []int) {
 	index := 0
+	maze := make(map[int]string)
+
+	for _, wall := range walls {
+		maze[wall] = "###"
+	}
+	for _, step := range path {
+		maze[step] = " . "
+	}
 	for row := 0; row < size; row++ {
 		for collumn := 0; collumn < size; collumn++ {
 			index++
-			isWall := false
-			for _, wall := range walls {
-				if index == wall {
-					isWall = true
-					break
-				}
-			}
-			isPath := false
-			for _, step := range path {
-				if index == step {
-					isPath = true
-					break
-				}
-			}
-			if isWall {
-				fmt.Print("###")
-			} else if isPath {
-				fmt.Print(" . ")
-			} else {
+			mapped := maze[index]
+			if mapped == "" {
 				fmt.Print("   ")
+			} else {
+				fmt.Print(mapped)
 			}
 		}
 		fmt.Println()
