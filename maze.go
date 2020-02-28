@@ -1,6 +1,9 @@
 package maze
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 //ShortestRoutes search the most optimal route to reach the target on a given params
 //size := the size of the grid (ex. 5)
@@ -111,4 +114,35 @@ func availablePaths(size int, walls []int, position int) []int {
 //helper function to remove slice of slices element
 func remove(slice [][]int, s int) [][]int {
 	return append(slice[:s], slice[s+1:]...)
+}
+
+func DisplayMaze(size int, walls, path []int) {
+	index := 0
+	for row := 0; row < size; row++ {
+		for collumn := 0; collumn < size; collumn++ {
+			index++
+			isWall := false
+			for _, wall := range walls {
+				if index == wall {
+					isWall = true
+					break
+				}
+			}
+			isPath := false
+			for _, step := range path {
+				if index == step {
+					isPath = true
+					break
+				}
+			}
+			if isWall {
+				fmt.Print("###")
+			} else if isPath {
+				fmt.Print(" . ")
+			} else {
+				fmt.Print("   ")
+			}
+		}
+		fmt.Println()
+	}
 }

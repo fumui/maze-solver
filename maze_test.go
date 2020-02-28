@@ -112,6 +112,7 @@ func TestShortestRoute(t *testing.T) {
 			break
 		}
 	}
+	DisplayMaze(21, walls, shortestRoutes[0])
 
 	mazeString = "###########********#*######*###*##***#*#***##*###*#*####*#***#*#*##*###*#*#*##*********####*########**********###########"
 	walls = getWalls(mazeString, wallChar)
@@ -123,6 +124,7 @@ func TestShortestRoute(t *testing.T) {
 			break
 		}
 	}
+	DisplayMaze(11, walls, shortestRoutes[0])
 
 	shortestRoutes = ShortestRoutes(5, []int{6, 7, 8, 10}, 1, 11)
 	expected = []int{1, 2, 3, 4, 9, 14, 13, 12, 11}
