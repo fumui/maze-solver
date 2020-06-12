@@ -2,25 +2,29 @@ package maze
 
 import "testing"
 
+const AVAILABLE_PATH_ERR_STRING = "Test Failed on input:\n\tsize:\t%v\n\twalls:\t%v\n\tposition:\t%v\nExpecting output:\n\t%v\nBut got\n\t%v"
+const SHORTEST_ROUTE_ERR_STRING = "Test Fail, Expecting \n%v \nbut got \n%v"
+
 func TestAvailablePaths(t *testing.T) {
 	basicTesting := func(t *testing.T, size int, walls []int, position int, expectedOutput []int) {
 		output := availablePaths(size, walls, position)
-		for _, val := range output {
-			exist := false
-			for _, expectedVal := range expectedOutput {
-				if expectedVal == val {
-					exist = true
-				}
-			}
-			if !exist || len(output) != len(expectedOutput) {
-				t.Errorf(
-					"Test Failed on input:\n\tsize:\t%v\n\twalls:\t%v\n\tposition:\t%v\nExpecting output:\n\t%v\nBut got\n\t%v",
-					size,
-					walls,
-					position,
-					expectedOutput,
-					output,
-				)
+		error := func(t *testing.T, size int, walls []int, position int, expectedOutput []int) {
+			t.Errorf(
+				AVAILABLE_PATH_ERR_STRING,
+				size,
+				walls,
+				position,
+				expectedOutput,
+				output,
+			)
+		}
+		if len(output) != len(expectedOutput) {
+			error(t, size, walls, position, expectedOutput)
+		}
+
+		for valIndex, val := range output {
+			if expectedOutput[valIndex] == val {
+				error(t, size, walls, position, expectedOutput)
 			}
 		}
 	}
@@ -108,7 +112,7 @@ func TestShortestRoute(t *testing.T) {
 	expected := []int{23, 24, 25, 26, 27, 48, 69, 90, 111, 132, 153, 152, 151, 172, 193, 214, 235, 236, 237, 258, 279, 300, 321, 342, 363, 364, 365, 386, 407, 408, 409, 410, 411, 412, 413, 414, 415, 394, 373, 374, 375, 396, 417, 418, 419, 420}
 	for index, step := range shortestRoutes[0] {
 		if step != expected[index] {
-			t.Errorf("Test Fail, Expecting \n%v \nbut got \n%v", expected, shortestRoutes[0])
+			t.Errorf(SHORTEST_ROUTE_ERR_STRING, expected, shortestRoutes[0])
 			break
 		}
 	}
@@ -120,7 +124,7 @@ func TestShortestRoute(t *testing.T) {
 	expected = []int{12, 13, 14, 15, 16, 17, 28, 39, 50, 61, 72, 83, 82, 81, 92, 103, 104, 105, 106, 107, 108, 109, 110}
 	for index, step := range shortestRoutes[0] {
 		if step != expected[index] {
-			t.Errorf("Test Fail, Expecting \n%v \nbut got \n%v", expected, shortestRoutes[0])
+			t.Errorf(SHORTEST_ROUTE_ERR_STRING, expected, shortestRoutes[0])
 			break
 		}
 	}
@@ -130,7 +134,7 @@ func TestShortestRoute(t *testing.T) {
 	expected = []int{1, 2, 3, 4, 9, 14, 13, 12, 11}
 	for index, step := range shortestRoutes[0] {
 		if step != expected[index] {
-			t.Errorf("Test Fail, Expecting \n%v \nbut got \n%v", expected, shortestRoutes[0])
+			t.Errorf(SHORTEST_ROUTE_ERR_STRING, expected, shortestRoutes[0])
 			break
 		}
 	}
