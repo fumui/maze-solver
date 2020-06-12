@@ -16,7 +16,7 @@ pipeline {
 		}
 		stage("Quality Control") {
             steps {
-                withSonarQubeEnv('sonar') { // If you have configured more than one global server connection, you can specify its name
+                withSonarQubeEnv('GCP Sonarqube') { // If you have configured more than one global server connection, you can specify its name
                 }
 			}
 		}
