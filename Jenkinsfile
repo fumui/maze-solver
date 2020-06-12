@@ -14,17 +14,15 @@ pipeline {
 				sh 'echo TEST'
 			}
 		}
-		stage("Quality Control") {
+		stage('Quality Control') {
+            environment {
+                scannerHome = tool 'sonar'
+            }
             steps {
-                withSonarQubeEnv('GCP Sonarqube') { // If you have configured more than one global server connection, you can specify its name
+                withSonarQubeEnv('GCP Sonarqube') {
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
-			}
-		}
-        stage("Quality Gate"){
-            steps {
-                timeout(time: 1, unit: 'HOURS') {
-                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
-                    // true = set pipeline to UNSTABLE, false = don't
+                timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
