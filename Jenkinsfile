@@ -14,6 +14,12 @@ pipeline {
 				sh 'echo TEST'
 			}
 		}
+		stage("Quality Control") {
+            steps {
+                withSonarQubeEnv('sonar') { // If you have configured more than one global server connection, you can specify its name
+                }
+			}
+		}
 		stage("PUSH") {
 			steps {
 				sh 'echo PUSH'
